@@ -40,6 +40,37 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ],
+        'etudiant' => [
+            'driver' => 'session',
+            'provider' => 'etudiants',
+        ],
+        'encadrant' => [
+            'driver' => 'session',
+            'provider' => 'encadrants',
+        ],   
+        'api' => [
+            'driver' => 'passport',
+            'provider' => 'users',
+        ],
+
+        'admin-api' => [
+            'driver' => 'passport',
+            'provider' => 'admins',
+        ],
+        'etudiant-api' => [
+            'driver' => 'passport',
+            'provider' => 'etudiants',
+        ],
+        'encadrant-api' => [
+            'driver' => 'passport',
+            'provider' => 'encadrants',
+        ],
+
+
     ],
 
     /*
@@ -64,13 +95,19 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class,
+        ],
+        'etudiants' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Etudiant::class,
+        ],
+        'encadrants' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Encadrant::class,
+        ],
     ],
-
     /*
     |--------------------------------------------------------------------------
     | Resetting Passwords
@@ -93,6 +130,24 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'admins' => [
+            'provider' => 'admins',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'etudiants' => [
+            'provider' => 'etudiants',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'encadrants' => [
+            'provider' => 'encadrants',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,

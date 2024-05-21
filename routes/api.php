@@ -2,7 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\AuthController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,6 +15,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::middleware('auth:admin-api')->group(function () {
+    Route::get('/admin/dashboard', function (Request $request) {
+        return response()->json(['message' => 'Admin Dashboard', 'user' => $request->user()]);
+    });
+});
+
+Route::middleware('auth:etudiant-api')->group(function () {
+    Route::get('/etudiant/dashboard', function (Request $request) {
+        return response()->json(['message' => 'Etudiant Dashboard', 'user' => $request->user()]);
+    });
+});
+
+Route::middleware('auth:encadrant-api')->group(function () {
+    Route::get('/encadrant/dashboard', function (Request $request) {
+        return response()->json(['message' => 'Encadrant Dashboard', 'user' => $request->user()]);
+    });
 });
