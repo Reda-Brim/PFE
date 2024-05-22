@@ -16,6 +16,9 @@ use App\Http\Controllers\API\AuthController;
 */
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/registerEtudiant', [AuthController::class, 'registerEtudiant']);
+Route::post('/registerEncadrant', [AuthController::class, 'registerEncadrant']);
+
 
 Route::middleware('auth:admin-api')->group(function () {
     Route::get('/admin/dashboard', function (Request $request) {

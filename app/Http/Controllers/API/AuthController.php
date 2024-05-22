@@ -81,4 +81,84 @@ class AuthController extends Controller
             'type' => $type
         ], 200);
     }
+
+
+    public function registerEtudiant(Request $request)
+    {
+        // Validation des données d'entrée
+        $request->validate([
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'email' => 'required|email|unique:etudiants',
+            'cin' => 'required|string|max:255',
+            'cne' => 'required|string|max:255',
+            'filiere' => 'required|string|max:255',
+            'password' => 'required|string|min:6|confirmed',
+            'password_confirmation' => 'required|string|min:6',
+        ]);
+    
+        // Hachage du mot de passe
+        $hashedPassword = Hash::make($request->password);
+    
+        // Création de l'utilisateur étudiant
+        $etudiant = Etudiant::create([
+            'nom' => $request->nom,
+            'prenom' => $request->prenom,
+            'email' => $request->email,
+            'cin' => $request->cin,
+            'cne' => $request->cne,
+            'filiere' => $request->filiere,
+            'password' => $hashedPassword,
+        ]);
+    
+        // Génération du jeton d'accès
+        $token = $etudiant->createToken("EtudiantToken")->accessToken;
+    
+        // Retourner les informations de l'utilisateur et le jeton d'accès
+        return response()->json([
+            'message' => 'Étudiant enregistré avec succès',
+            'id' => $etudiant->id,
+            'username' => $etudiant->email,
+            'token' => $token,
+            'type' => 'etudiant'
+        ], 201);
+    }
+
+    public function registerEncadrant(Request $request)
+{
+    // Validation des données d'entrée
+    $request->validate([
+        'nom' => 'required|string|max:255',
+        'prenom' => 'required|string|max:255',
+        'email' => 'required|email|unique:encadrants',
+        'specialite' => 'required|string|max:255',
+        'password' => 'required|string|min:6|confirmed',
+        'password_confirmation' => 'required|string|min:6',
+    ]);
+
+    // Hachage du mot de passe
+    $hashedPassword = Hash::make($request->password);
+
+    // Création de l'encadrant
+    $encadrant = Encadrant::create([
+        'nom' => $request->nom,
+        'prenom' => $request->prenom,
+        'email' => $request->email,
+        'specialite' => $request->specialite,
+        'password' => $hashedPassword,
+    ]);
+
+    // Génération du jeton d'accès
+    $token = $encadrant->createToken("EncadrantToken")->accessToken;
+
+    // Retourner les informations de l'encadrant et le jeton d'accès
+    return response()->json([
+        'message' => 'Encadrant enregistré avec succès',
+        'id' => $encadrant->id,
+        'username' => $encadrant->email,
+        'token' => $token,
+        'type' => 'encadrant'
+    ], 201);
+}
+
 }
