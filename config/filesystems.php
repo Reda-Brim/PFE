@@ -56,6 +56,16 @@ return [
             'throw' => false,
         ],
 
+        'firebase' => [
+            'driver' => 'firebase',
+            'project_id' => 'pfe-files',
+            'storage_bucket' => 'gs://pfe-files.appspot.com',
+            'database_url' => 'https://pfe-files-default-rtdb.firebaseio.com/',
+            'credential_file' => storage_path('app/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'),
+        ],
+        
+
+
     ],
 
     /*

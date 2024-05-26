@@ -12,5 +12,6 @@ class Sujets extends Model
     protected $fillable = [
         'nom',
         'document',
+        'document_hash',
     ];
 }

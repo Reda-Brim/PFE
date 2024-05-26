@@ -8,6 +8,16 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Admin;
 use App\Models\Etudiant;
 use App\Models\Encadrant;
+use App\Models\Sujets;
+use Kreait\Firebase\Factory;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use GuzzleHttp\Psr7\Uri;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
+use Illuminate\Validation\ValidationException;
+
+
 class AdminController extends Controller
 {
     public function addEtudiant(Request $request)
@@ -263,6 +273,130 @@ public function updateAdmin(Request $request)
     return response()->json(['message' => 'Informations administrateur mises à jour avec succès', 'admin' => $admin]);
 }
 
+public function addSujet(Request $request)
+{
+    try {
+        // Validation des données d'entrée
+        $request->validate([
+            'nom' => 'required|string|max:255',
+            'document' => 'required|file|mimes:pdf|max:2048', // Ajout de la validation pour le document PDF
+        ]);
 
+        // Vérification de l'existence d'un sujet avec le même nom
+        if (Sujets::where('nom', $request->nom)->exists()) {
+            return response()->json(['error' => 'Un sujet avec ce nom existe déjà.'], 409);
+        }
+
+        // Enregistrement temporaire du fichier PDF et calcul du hachage
+        $documentPath = $request->file('document')->store('documents');
+        $documentHash = md5_file(storage_path('app/' . $documentPath));
+
+        // Vérification de l'existence d'un fichier avec le même hachage
+        if (Sujets::where('document_hash', $documentHash)->exists()) {
+            Storage::delete($documentPath); // Supprimer le fichier temporaire
+            return response()->json(['error' => 'Un fichier identique existe déjà.'], 409);
+        }
+
+        // Configuration de Firebase
+        $firebase = (new Factory)->withServiceAccount(storage_path('app/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))->createStorage();
+        $bucket = $firebase->getBucket();
+
+        // Téléverser le fichier PDF vers Firebase Storage
+        $firebaseStoragePath = 'documents/' . basename($documentPath);
+        $bucket->upload(fopen(storage_path('app/' . $documentPath), 'r'), ['name' => $firebaseStoragePath]);
+
+        // Obtenir l'URL de téléchargement public
+        $downloadUrl = $bucket->object($firebaseStoragePath)->signedUrl(new \DateTime('+1 year'));
+
+        // Création du sujet dans la base de données MySQL avec l'URL du fichier et le hachage
+        $sujet = Sujets::create([
+            'nom' => $request->nom,
+            'document' => $downloadUrl,
+            'document_hash' => $documentHash, // Ajout du hachage dans la base de données
+        ]);
+
+        // Supprimer le fichier temporaire après téléversement réussi
+        Storage::delete($documentPath);
+
+        return response()->json(['message' => 'Sujet ajouté avec succès', 'sujet' => $sujet], 201);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Erreur lors de l\'ajout du sujet: ' . $e->getMessage()], 500);
+    }
+}
+public function updateSujet(Request $request, $id)
+{
+    try {
+        // Validation des données d'entrée
+        $request->validate([
+            'nom' => 'sometimes|required|string|max:255',
+            'document' => 'sometimes|file|mimes:pdf|max:2048', // La validation du document est optionnelle
+        ]);
+
+        $sujet = Sujets::findOrFail($id);
+        $updateData = [];
+
+        if ($request->has('nom')) {
+            $updateData['nom'] = $request->nom;
+        }
+
+        if ($request->hasFile('document')) {
+            // Enregistrement temporaire du fichier PDF et calcul du hachage
+            $documentPath = $request->file('document')->store('documents');
+            $documentHash = md5_file(storage_path('app/' . $documentPath));
+
+            // Vérification de l'existence d'un fichier avec le même hachage
+            if (Sujets::where('document_hash', $documentHash)->where('id', '<>', $id)->exists()) {
+                Storage::delete($documentPath); // Supprimer le fichier temporaire
+                return response()->json(['error' => 'Un fichier identique existe déjà.'], 409);
+            }
+
+            // Configuration de Firebase
+            $firebase = (new Factory)->withServiceAccount(storage_path('app/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))->createStorage();
+            $bucket = $firebase->getBucket();
+
+            // Téléverser le fichier PDF vers Firebase Storage
+            $firebaseStoragePath = 'documents/' . basename($documentPath);
+            $bucket->upload(fopen(storage_path('app/' . $documentPath), 'r'), ['name' => $firebaseStoragePath]);
+
+            // Obtenir l'URL de téléchargement public
+            $downloadUrl = $bucket->object($firebaseStoragePath)->signedUrl(new \DateTime('+1 year'));
+
+            $updateData['document'] = $downloadUrl;
+            $updateData['document_hash'] = $documentHash;
+
+            // Supprimer le fichier temporaire après téléversement réussi
+            Storage::delete($documentPath);
+        }
+
+        // Mise à jour du sujet dans la base de données MySQL
+        $sujet->update($updateData);
+
+        return response()->json(['message' => 'Sujet mis à jour avec succès', 'sujet' => $sujet], 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Erreur lors de la mise à jour du sujet: ' . $e->getMessage()], 500);
+    }
+}
+public function deleteSujet($id)
+{
+    try {
+        $sujet = Sujets::findOrFail($id);
+
+        // Supprimer le fichier du stockage Firebase
+        $firebase = (new Factory)->withServiceAccount(storage_path('app/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))->createStorage();
+        $bucket = $firebase->getBucket();
+        $firebaseStoragePath = 'documents/' . basename($sujet->document);
+        $object = $bucket->object($firebaseStoragePath);
+        if ($object->exists()) {
+            $object->delete();
+        }
+
+        // Supprimer le sujet de la base de données
+        $sujet->delete();
+
+        return response()->json(['message' => 'Sujet supprimé avec succès'], 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Erreur lors de la suppression du sujet: ' . $e->getMessage()], 500);
+    }
+}
 
 }
