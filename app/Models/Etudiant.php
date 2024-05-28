@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,10 +10,10 @@ use Laravel\Passport\HasApiTokens;
 
 class Etudiant extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens, Notifiable, HasFactory;
 
     protected $fillable = [
-        'nom', 'prenom', 'email', 'cin', 'cne', 'filiere', 'password',
+        'nom', 'prenom', 'email', 'codeApoge', 'cin', 'cne', 'filiere', 'password',
     ];
 
     protected $hidden = [

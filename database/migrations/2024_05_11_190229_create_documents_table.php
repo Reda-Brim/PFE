@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('lien');
             $table->unsignedBigInteger('tache_id');
             $table->timestamps();
-
             $table->foreign('tache_id')->references('id')->on('taches')->onDelete('cascade');
         });
     }

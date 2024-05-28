@@ -12,11 +12,16 @@ class Encadrant extends Authenticatable
     use HasApiTokens, Notifiable;
 
     protected $fillable = [
-        'nom', 'prenom', 'email', 'specialite', 'password',
+        'nom', 'prenom', 'email', 'specialite', 'password','encadrant_code',
     ];
 
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function equipes()
+    {
+        return $this->hasMany(Equipe::class, 'encadrant_code', 'encadrant_code');
+    }
 }
 

@@ -56,7 +56,12 @@ Route::middleware('auth:admin-api')->group(function () {
     Route::put('/update-sujet/{id}', [AdminController::class, 'updateSujet']);
     Route::delete('/delete-sujet/{id}', [AdminController::class, 'deleteSujet']);
 
-    
+    Route::post('/createequipe', [AdminController::class, 'createEquipe']);
+    Route::put('/assignencadrant/{id}', [AdminController::class, 'assignEncadrant']);
+    Route::get('/list-equipes', [AdminController::class, 'listEquipes']);
+    Route::post('/list-equipes/{equipe}/addmembre', [AdminController::class, 'addMemberToEquipe']);
+    Route::delete('/list-equipes/{equipe}/deletemembre', [AdminController::class, 'removeMemberFromEquipe']);
+    Route::delete('/list-equipes/{id}', [AdminController::class, 'deleteEquipe']);
 
 });
 
