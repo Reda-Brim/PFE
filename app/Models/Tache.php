@@ -28,4 +28,5 @@ class Tache extends Model
     {
         return $this->hasMany(Document::class);
     }
+
 }

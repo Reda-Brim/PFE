@@ -25,7 +25,7 @@ class Projet extends Model
 
     public function sujet()
     {
-        return $this->belongsTo(Sujet::class);
+        return $this->belongsTo(Sujets::class);
     }
 
     public function taches()

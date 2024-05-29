@@ -15,6 +15,6 @@ class Document extends Model
 
     public function tache()
     {
-        return $this->belongsTo(Tache::class);
+        return $this->belongsTo(Tache::class, 'tache_id');
     }
 }

@@ -71,6 +71,8 @@ Route::middleware('auth:etudiant-api')->group(function () {
     Route::get('/etudiant/dashboard', function (Request $request) {
         return response()->json(['message' => 'Etudiant Dashboard', 'user' => $request->user()]);
     });
+    Route::get('/etudiant/sujet-assigne', [EtudiantController::class, 'getAssignedSubject']);
+    Route::get('/etudiant/taches-assignees', [EtudiantController::class, 'getAssignedTasks']);
 
 
 });
