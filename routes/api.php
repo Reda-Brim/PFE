@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AdminController;
+use App\Http\Controllers\API\EncadrantController;
+use App\Http\Controllers\API\EtudiantController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -69,10 +71,17 @@ Route::middleware('auth:etudiant-api')->group(function () {
     Route::get('/etudiant/dashboard', function (Request $request) {
         return response()->json(['message' => 'Etudiant Dashboard', 'user' => $request->user()]);
     });
+
+
 });
 
 Route::middleware('auth:encadrant-api')->group(function () {
     Route::get('/encadrant/dashboard', function (Request $request) {
         return response()->json(['message' => 'Encadrant Dashboard', 'user' => $request->user()]);
     });
+    Route::get('/encadrant/equipes', [EncadrantController::class, 'listEquipes']);
+    Route::get('/encadrant/sujets', [EncadrantController::class, 'listSujets']);
+    Route::post('/encadrant/add-sujets', [EncadrantController::class, 'addSujet']);
+    Route::post('/encadrant/equipes/{equipe}/assign-sujet', [EncadrantController::class, 'assignSujetToEquipe']);
+
 });

@@ -13,5 +13,6 @@ class Sujets extends Model
         'nom',
         'document',
         'document_hash',
+        'disponible',
     ];
 }
