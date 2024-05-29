@@ -18,13 +18,18 @@ class Projet extends Model
         'etat',
     ];
 
+    public function equipe()
+    {
+        return $this->belongsTo(Equipe::class);
+    }
+
     public function sujet()
     {
         return $this->belongsTo(Sujet::class);
     }
 
-    public function equipe()
+    public function taches()
     {
-        return $this->belongsTo(Equipe::class);
+        return $this->hasMany(Tache::class);
     }
 }
