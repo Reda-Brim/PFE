@@ -10,6 +10,7 @@ use App\Models\Etudiant;
 use App\Models\Equipe;
 use App\Models\Encadrant;
 use App\Models\Sujets;
+use App\Models\Projet;
 use Kreait\Firebase\Factory;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -573,5 +574,22 @@ public function addMemberToEquipe(Request $request, Equipe $equipe)
     return response()->json(['message' => 'Équipe créée avec succès', 'equipe' => $equipe], 201);
 }
 
-    
+public function getStatistics() {
+    // Gather various statistics
+    $totalEtudiants = Etudiant::count();
+    $totalEquipes = Equipe::count();
+    $totalProjets = Projet::count();
+    $completedProjects = Projet::where('etat', 'termine')->count();
+    $inProgressProjects = Projet::where('etat', 'en_cours')->count();
+    $pendingProjects = Projet::where('etat', 'suspendu')->count();
+
+    return response()->json([
+        'totalEtudiants' => $totalEtudiants,
+        'totalEquipes' => $totalEquipes,
+        'totalProjets' => $totalProjets,
+        'completedProjects' => $completedProjects,
+        'inProgressProjects' => $inProgressProjects,
+        'pendingProjects' => $pendingProjects,
+    ], 200);
+}
 }

@@ -19,4 +19,10 @@ class Etudiant extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+    public function equipe()
+    {
+        return $this->hasOne(Equipe::class, 'etudiant_1_codeApoge', 'codeApoge')
+                    ->orWhere('etudiant_2_codeApoge', 'codeApoge')
+                    ->orWhere('etudiant_3_codeApoge', 'codeApoge');
+    }
 }

@@ -53,6 +53,9 @@ Route::middleware('auth:admin-api')->group(function () {
     Route::get('/admin-infos', [AdminController::class, 'getAdmin']);
     Route::put('/update-admin', [AdminController::class, 'updateAdmin']);
 
+    Route::get('/admin/statistics', [AdminController::class, 'getStatistics']);
+
+
 
     Route::post('/add-sujets', [AdminController::class, 'addSujet']);
     Route::put('/update-sujet/{id}', [AdminController::class, 'updateSujet']);
@@ -73,6 +76,11 @@ Route::middleware('auth:etudiant-api')->group(function () {
     });
     Route::get('/etudiant/sujet-assigne', [EtudiantController::class, 'getAssignedSubject']);
     Route::get('/etudiant/taches-assignees', [EtudiantController::class, 'getAssignedTasks']);
+    Route::get('/etudiant/equipe-members', [EtudiantController::class, 'getEquipeMembers']);
+
+    Route::post('/etudiant/change-password', [EtudiantController::class, 'changePassword']);
+
+
 
 
 });
