@@ -23,44 +23,47 @@ use Illuminate\Validation\ValidationException;
 class AdminController extends Controller
 {
     public function addEtudiant(Request $request)
-{
-    // Validation des données d'entrée
-    $request->validate([
-        'nom' => 'required|string|max:255',
-        'prenom' => 'required|string|max:255',
-        'email' => 'required|email|unique:etudiants',
-        'cin' => 'required|string|max:255|unique:etudiants',
-        'cne' => 'required|string|max:255|unique:etudiants',
-        'filiere' => 'required|string|in:BDD,SID,RES',
-        'password' => 'required|string|min:6|confirmed',
-    ]);
-
-    // Hachage du mot de passe
-    $hashedPassword = Hash::make($request->password);
-
-    // Création de l'utilisateur étudiant
-    $etudiant = Etudiant::create([
-        'nom' => $request->nom,
-        'prenom' => $request->prenom,
-        'email' => $request->email,
-        'cin' => $request->cin,
-        'cne' => $request->cne,
-        'filiere' => $request->filiere,
-        'password' => $hashedPassword,
-    ]);
-
-    // Génération du jeton d'accès
-    $token = $etudiant->createToken("EtudiantToken")->accessToken;
-
-    // Retourner les informations de l'utilisateur et le jeton d'accès
-    return response()->json([
-        'id' => $etudiant->id,
-        'username' => $etudiant->email,
-        'token' => $token,
-        'type' => 'etudiant',
-        'message' => 'Enregistrement réussi'
-    ], 201);
-}
+    {
+        // Validation des données d'entrée
+        $request->validate([
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'email' => 'required|email|unique:etudiants',
+            'cin' => 'required|string|max:255|unique:etudiants',
+            'cne' => 'required|string|max:255|unique:etudiants',
+            'codeApoge' => 'required|string|max:255|unique:etudiants',
+            'filiere' => 'required|string|in:BDD,SID,RES',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+    
+        // Hachage du mot de passe
+        $hashedPassword = Hash::make($request->password);
+    
+        // Création de l'utilisateur étudiant
+        $etudiant = Etudiant::create([
+            'nom' => $request->nom,
+            'prenom' => $request->prenom,
+            'email' => $request->email,
+            'cin' => $request->cin,
+            'cne' => $request->cne,
+            'codeApoge' => $request->codeApoge,
+            'filiere' => $request->filiere,
+            'password' => $hashedPassword,
+        ]);
+    
+        // Génération du jeton d'accès
+        $token = $etudiant->createToken("EtudiantToken")->accessToken;
+    
+        // Retourner les informations de l'utilisateur et le jeton d'accès
+        return response()->json([
+            'id' => $etudiant->id,
+            'username' => $etudiant->email,
+            'token' => $token,
+            'type' => 'etudiant',
+            'message' => 'Enregistrement réussi'
+        ], 201);
+    }
+    
 
     public function addEncadrant(Request $request)
     {
@@ -69,25 +72,27 @@ class AdminController extends Controller
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
             'email' => 'required|email|unique:encadrants',
+            'encadrant_code' => 'required|string|max:255|unique:encadrants',
             'specialite' => 'required|string|max:255',
             'password' => 'required|string|min:6|confirmed',
         ]);
-
+    
         // Hachage du mot de passe
         $hashedPassword = Hash::make($request->password);
-
+    
         // Création de l'utilisateur encadrant
         $encadrant = Encadrant::create([
             'nom' => $request->nom,
             'prenom' => $request->prenom,
             'email' => $request->email,
+            'encadrant_code' => $request->encadrant_code,
             'specialite' => $request->specialite,
             'password' => $hashedPassword,
         ]);
-
+    
         // Génération du jeton d'accès
         $token = $encadrant->createToken("EncadrantToken")->accessToken;
-
+    
         // Retourner les informations de l'utilisateur et le jeton d'accès avec un code de statut 201 (Créé)
         return response()->json([
             'message' => 'Encadrant ajouté avec succès',
@@ -98,96 +103,104 @@ class AdminController extends Controller
         ], 201);
     }
     
-   public function updateEtudiant(Request $request, $id)
-{
-    // Valider les données d'entrée
-    $request->validate([
-        'nom' => 'sometimes|required|string|max:255',
-        'prenom' => 'sometimes|required|string|max:255',
-        'email' => 'sometimes|required|email|unique:etudiants,email,' . $id,
-        'cin' => 'sometimes|required|string|max:255|unique:etudiants,cin,' . $id,
-        'cne' => 'sometimes|required|string|max:255|unique:etudiants,cne,' . $id,
-        'filiere' => 'sometimes|required|string|max:255',
-        'password' => 'nullable|string|min:6|confirmed',
-    ]);
-
-    // Recherche de l'étudiant à mettre à jour
-    $etudiant = Etudiant::findOrFail($id);
-
-    // Mise à jour des champs
-    if ($request->has('nom')) {
-        $etudiant->nom = $request->nom;
-    }
-    if ($request->has('prenom')) {
-        $etudiant->prenom = $request->prenom;
-    }
-    if ($request->has('email')) {
-        $etudiant->email = $request->email;
-    }
-    if ($request->has('cin')) {
-        $etudiant->cin = $request->cin;
-    }
-    if ($request->has('cne')) {
-        $etudiant->cne = $request->cne;
-    }
-    if ($request->has('filiere')) {
-        $etudiant->filiere = $request->filiere;
+    public function updateEtudiant(Request $request, $id)
+    {
+        // Valider les données d'entrée
+        $request->validate([
+            'nom' => 'sometimes|required|string|max:255',
+            'prenom' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|unique:etudiants,email,' . $id,
+            'cin' => 'sometimes|required|string|max:255|unique:etudiants,cin,' . $id,
+            'cne' => 'sometimes|required|string|max:255|unique:etudiants,cne,' . $id,
+            'codeApoge' => 'sometimes|required|string|max:255|unique:etudiants,codeApoge,' . $id,
+            'filiere' => 'sometimes|required|string|in:BDD,SID,RES',
+            'password' => 'nullable|string|min:6|confirmed',
+        ]);
+    
+        // Recherche de l'étudiant à mettre à jour
+        $etudiant = Etudiant::findOrFail($id);
+    
+        // Mise à jour des champs
+        if ($request->has('nom')) {
+            $etudiant->nom = $request->nom;
+        }
+        if ($request->has('prenom')) {
+            $etudiant->prenom = $request->prenom;
+        }
+        if ($request->has('email')) {
+            $etudiant->email = $request->email;
+        }
+        if ($request->has('cin')) {
+            $etudiant->cin = $request->cin;
+        }
+        if ($request->has('cne')) {
+            $etudiant->cne = $request->cne;
+        }
+        if ($request->has('codeApoge')) {
+            $etudiant->codeApoge = $request->codeApoge;
+        }
+        if ($request->has('filiere')) {
+            $etudiant->filiere = $request->filiere;
+        }
+    
+        // Mise à jour du mot de passe s'il est fourni
+        if ($request->has('password')) {
+            $etudiant->password = Hash::make($request->password);
+        }
+    
+        // Enregistrement des modifications
+        $etudiant->save();
+    
+        return response()->json(['message' => 'Étudiant mis à jour avec succès', 'etudiant' => $etudiant]);
     }
     
-    // Mise à jour du mot de passe s'il est fourni
-    if ($request->has('password')) {
-        $etudiant->password = Hash::make($request->password);
-    }
-
-    // Enregistrement des modifications
-    $etudiant->save();
-
-    return response()->json(['message' => 'Étudiant mis à jour avec succès', 'etudiant' => $etudiant]);
-}
-
-public function updateEncadrant(Request $request, $id)
-{
-    // Valider les données d'entrée
-    $request->validate([
-        'nom' => 'sometimes|required|string|max:255',
-        'prenom' => 'sometimes|required|string|max:255',
-        'email' => 'sometimes|required|email|unique:encadrants,email,' . $id,
-        'cin' => 'sometimes|required|string|max:255|unique:encadrants,cin,' . $id,
-        'specialite' => 'sometimes|required|string|max:255',
-        'password' => 'nullable|string|min:6|confirmed',
-    ]);
-
-    // Recherche de l'encadrant à mettre à jour
-    $encadrant = Encadrant::findOrFail($id);
-
-    // Mise à jour des champs
-    if ($request->has('nom')) {
-        $encadrant->nom = $request->nom;
-    }
-    if ($request->has('prenom')) {
-        $encadrant->prenom = $request->prenom;
-    }
-    if ($request->has('email')) {
-        $encadrant->email = $request->email;
-    }
-    if ($request->has('cin')) {
-        $encadrant->cin = $request->cin;
-    }
-    if ($request->has('specialite')) {
-        $encadrant->specialite = $request->specialite;
+    public function updateEncadrant(Request $request, $id)
+    {
+        // Valider les données d'entrée
+        $request->validate([
+            'nom' => 'sometimes|required|string|max:255',
+            'prenom' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|unique:encadrants,email,' . $id,
+            'cin' => 'sometimes|required|string|max:255|unique:encadrants,cin,' . $id,
+            'encadrant_code' => 'sometimes|required|string|max:255|unique:encadrants,encadrant_code,' . $id,
+            'specialite' => 'sometimes|required|string|max:255',
+            'password' => 'nullable|string|min:6|confirmed',
+        ]);
+    
+        // Recherche de l'encadrant à mettre à jour
+        $encadrant = Encadrant::findOrFail($id);
+    
+        // Mise à jour des champs
+        if ($request->has('nom')) {
+            $encadrant->nom = $request->nom;
+        }
+        if ($request->has('prenom')) {
+            $encadrant->prenom = $request->prenom;
+        }
+        if ($request->has('email')) {
+            $encadrant->email = $request->email;
+        }
+        if ($request->has('cin')) {
+            $encadrant->cin = $request->cin;
+        }
+        if ($request->has('encadrant_code')) {
+            $encadrant->encadrant_code = $request->encadrant_code;
+        }
+        if ($request->has('specialite')) {
+            $encadrant->specialite = $request->specialite;
+        }
+    
+        // Mise à jour du mot de passe s'il est fourni
+        if ($request->has('password')) {
+            $encadrant->password = Hash::make($request->password);
+        }
+    
+        // Enregistrement des modifications
+        $encadrant->save();
+    
+        return response()->json(['message' => 'Encadrant mis à jour avec succès', 'encadrant' => $encadrant]);
     }
     
-    // Mise à jour du mot de passe s'il est fourni
-    if ($request->has('password')) {
-        $encadrant->password = Hash::make($request->password);
-    }
-
-    // Enregistrement des modifications
-    $encadrant->save();
-
-    return response()->json(['message' => 'Encadrant mis à jour avec succès', 'encadrant' => $encadrant]);
-}
-
 
 public function deleteEtudiant($id)
 {
