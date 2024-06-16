@@ -90,9 +90,10 @@ class AuthController extends Controller
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
             'email' => 'required|email|unique:etudiants',
-            'cin' => 'required|string|max:255',
-            'cne' => 'required|string|max:255',
-            'filiere' => 'required|string|max:255',
+            'cin' => 'required|string|max:255|unique:etudiants',
+            'cne' => 'required|string|max:255|unique:etudiants',
+            'codeApoge' => 'required|string|max:255|unique:etudiants',
+            'filiere' => 'required|string|in:BDD,SID,RES',
             'password' => 'required|string|min:6|confirmed',
             'password_confirmation' => 'required|string|min:6',
         ]);
@@ -107,6 +108,7 @@ class AuthController extends Controller
             'email' => $request->email,
             'cin' => $request->cin,
             'cne' => $request->cne,
+            'codeApoge' => $request->codeApoge,
             'filiere' => $request->filiere,
             'password' => $hashedPassword,
         ]);
@@ -131,6 +133,7 @@ class AuthController extends Controller
         'nom' => 'required|string|max:255',
         'prenom' => 'required|string|max:255',
         'email' => 'required|email|unique:encadrants',
+        'encadrant_code' => 'required|string|max:255|unique:encadrants',
         'specialite' => 'required|string|max:255',
         'password' => 'required|string|min:6|confirmed',
         'password_confirmation' => 'required|string|min:6',
@@ -144,6 +147,7 @@ class AuthController extends Controller
         'nom' => $request->nom,
         'prenom' => $request->prenom,
         'email' => $request->email,
+        'encadrant_code' => $request->encadrant_code,
         'specialite' => $request->specialite,
         'password' => $hashedPassword,
     ]);
