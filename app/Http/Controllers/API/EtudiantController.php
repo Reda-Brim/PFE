@@ -108,4 +108,67 @@ public function changePassword(Request $request)
 
         return response()->json(['message' => 'Le mot de passe a été changé avec succès.'], 200);
     }
+    public function updateTache(Request $request, $tacheId)
+    {
+        $tache = Tache::findOrFail($tacheId);
+
+        // Validation des données d'entrée avec les règles conditionnelles
+        $request->validate([
+            'etat' => 'required|in:todo,encours,toreview,termine',
+            'document' => 'nullable|file|mimes:pdf|max:2048', // Optional document
+        ]);
+
+        // Vérification que l'étudiant fait partie de l'équipe liée à cette tâche
+        $etudiant = Auth::user();
+        $equipe = $tache->projet->equipe;
+
+        if ($equipe->etudiant_1_codeApoge !== $etudiant->codeApoge &&
+            $equipe->etudiant_2_codeApoge !== $etudiant->codeApoge &&
+            $equipe->etudiant_3_codeApoge !== $etudiant->codeApoge) {
+            return response()->json(['error' => 'Vous n\'êtes pas autorisé à modifier cette tâche.'], 403);
+        }
+
+        // Mise à jour de l'état de la tâche
+        $tache->etat = $request->etat;
+        $tache->save();
+
+        // Gérer le document s'il est fourni
+        if ($request->hasFile('document')) {
+            // Supprimer l'ancien document s'il existe
+            $existingDocument = Document::where('tache_id', $tache->id)->first();
+            if ($existingDocument) {
+                $firebase = (new Factory)
+                    ->withServiceAccount(storage_path('app/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))
+                    ->createStorage();
+                $bucket = $firebase->getBucket();
+                $bucket->object('documents/' . basename($existingDocument->lien))->delete();
+                $existingDocument->delete();
+            }
+
+            // Enregistrer le nouveau document
+            $documentPath = $request->file('document')->store('documents');
+            $firebase = (new Factory)
+                ->withServiceAccount(storage_path('app/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))
+                ->createStorage();
+            $bucket = $firebase->getBucket();
+
+            $firebaseStoragePath = 'documents/' . basename($documentPath);
+            $bucket->upload(fopen(storage_path('app/' . $documentPath), 'r'), ['name' => $firebaseStoragePath]);
+
+            // Obtenir l'URL de téléchargement public
+            $downloadUrl = $bucket->object($firebaseStoragePath)->signedUrl(new \DateTime('+1 year'));
+
+            // Enregistrer le lien dans la base de données
+            Document::create([
+                'tache_id' => $tache->id,
+                'lien' => $downloadUrl,
+            ]);
+
+            // Supprimer le fichier local après le téléversement
+            Storage::delete($documentPath);
+        }
+
+        return response()->json(['message' => 'Tâche mise à jour avec succès', 'tache' => $tache], 200);
+    }
+
 }

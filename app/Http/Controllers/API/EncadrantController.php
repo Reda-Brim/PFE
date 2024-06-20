@@ -186,7 +186,8 @@ public function assignSujetToEquipe(Request $request, $equipeId)
             'description' => 'nullable|string',
             'date_debut' => 'sometimes|required|date',
             'date_fin' => 'sometimes|required|date|after_or_equal:date_debut',
-            'etat' => 'sometimes|required|in:en_cours,terminee,suspendue',
+            'etat' => 'sometimes|required|in:todo,encours,toreview,termine',
+            'feedback' => 'nullable|string',
             'document' => 'nullable|file|mimes:pdf|max:2048', // Optional document
         ]);
 
@@ -196,7 +197,7 @@ public function assignSujetToEquipe(Request $request, $equipeId)
         }
 
         // Mise à jour des informations de la tâche
-        $tache->update($request->only(['titre', 'description', 'date_debut', 'date_fin', 'etat']));
+        $tache->update($request->only(['titre', 'description', 'date_debut', 'date_fin', 'etat', 'feedback']));
 
         // Gérer le document s'il est fourni
         if ($request->hasFile('document')) {
