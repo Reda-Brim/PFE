@@ -524,6 +524,80 @@ public function addMemberToEquipe(Request $request, Equipe $equipe)
         return response()->json(['message' => 'Membre supprimé de l\'équipe avec succès.'], 200);
     }
 
+    public function updateEquipe(Request $request, $id)
+{
+    // Validation des données d'entrée
+    $request->validate([
+        'etudiant_1_codeApoge' => 'required|exists:etudiants,codeApoge',
+        'etudiant_2_codeApoge' => 'required|exists:etudiants,codeApoge',
+        'etudiant_3_codeApoge' => 'nullable|exists:etudiants,codeApoge',
+        'encadrant_code' => 'nullable|exists:encadrants,encadrant_code',
+    ]);
+
+    // Recherche de l'équipe à mettre à jour
+    $equipe = Equipe::findOrFail($id);
+
+    // Récupération des étudiants
+    $etudiant1 = Etudiant::where('codeApoge', $request->etudiant_1_codeApoge)->first();
+    $etudiant2 = Etudiant::where('codeApoge', $request->etudiant_2_codeApoge)->first();
+    $etudiant3 = $request->etudiant_3_codeApoge ? Etudiant::where('codeApoge', $request->etudiant_3_codeApoge)->first() : null;
+
+    // Vérification que les étudiants n'appartiennent pas déjà à une équipe différente
+    $etudiant1Equipe = Equipe::where('id', '!=', $id)
+        ->where(function($query) use ($etudiant1) {
+            $query->where('etudiant_1_codeApoge', $etudiant1->codeApoge)
+                  ->orWhere('etudiant_2_codeApoge', $etudiant1->codeApoge)
+                  ->orWhere('etudiant_3_codeApoge', $etudiant1->codeApoge);
+        })
+        ->exists();
+
+    $etudiant2Equipe = Equipe::where('id', '!=', $id)
+        ->where(function($query) use ($etudiant2) {
+            $query->where('etudiant_1_codeApoge', $etudiant2->codeApoge)
+                  ->orWhere('etudiant_2_codeApoge', $etudiant2->codeApoge)
+                  ->orWhere('etudiant_3_codeApoge', $etudiant2->codeApoge);
+        })
+        ->exists();
+
+    $etudiant3Equipe = $etudiant3 ? Equipe::where('id', '!=', $id)
+        ->where(function($query) use ($etudiant3) {
+            $query->where('etudiant_1_codeApoge', $etudiant3->codeApoge)
+                  ->orWhere('etudiant_2_codeApoge', $etudiant3->codeApoge)
+                  ->orWhere('etudiant_3_codeApoge', $etudiant3->codeApoge);
+        })
+        ->exists() : false;
+
+    if ($etudiant1Equipe || $etudiant2Equipe || $etudiant3Equipe) {
+        return response()->json(['error' => 'Un ou plusieurs étudiants appartiennent déjà à une autre équipe.'], 409);
+    }
+
+    // Vérification que les étudiants sont de la même filière
+    if ($etudiant1->filiere !== $etudiant2->filiere || ($etudiant3 && $etudiant1->filiere !== $etudiant3->filiere)) {
+        return response()->json(['error' => 'Les étudiants doivent appartenir à la même filière.'], 409);
+    }
+
+    // Vérification que l'encadrant n'encadre pas plus de deux équipes
+    if ($request->encadrant_code) {
+        $encadrantTeamsCount = Equipe::where('encadrant_code', $request->encadrant_code)
+                                     ->where('id', '!=', $id)
+                                     ->count();
+        if ($encadrantTeamsCount >= 2) {
+            return response()->json(['error' => 'Cet encadrant encadre déjà deux équipes.'], 409);
+        }
+    }
+
+    // Mise à jour de l'équipe
+    $equipe->update([
+        'etudiant_1_codeApoge' => $request->etudiant_1_codeApoge,
+        'etudiant_2_codeApoge' => $request->etudiant_2_codeApoge,
+        'etudiant_3_codeApoge' => $request->etudiant_3_codeApoge,
+        'encadrant_code' => $request->encadrant_code,
+    ]);
+
+    return response()->json(['message' => 'Équipe mise à jour avec succès', 'equipe' => $equipe], 200);
+}
+
+
     public function deleteEquipe($id)
     {
         // Trouver l'équipe par son ID
