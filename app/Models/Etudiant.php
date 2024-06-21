@@ -25,4 +25,18 @@ class Etudiant extends Authenticatable
                     ->orWhere('etudiant_2_codeApoge', 'codeApoge')
                     ->orWhere('etudiant_3_codeApoge', 'codeApoge');
     }
+    public function equipe1()
+    {
+        return $this->hasOne(Equipe::class, 'etudiant_1_codeApoge', 'codeApoge');
+    }
+
+    public function equipe2()
+    {
+        return $this->hasOne(Equipe::class, 'etudiant_2_codeApoge', 'codeApoge');
+    }
+
+    public function equipe3()
+    {
+        return $this->hasOne(Equipe::class, 'etudiant_3_codeApoge', 'codeApoge');
+    }
 }

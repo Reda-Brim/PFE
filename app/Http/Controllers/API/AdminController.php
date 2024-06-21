@@ -230,6 +230,17 @@ public function listEtudiants()
     return response()->json(['etudiants' => $etudiants]);
 }
 
+public function listEtudiantsSansEquipe()
+{
+    // Retrieve all students who are not in any team
+    $etudiantsSansEquipe = Etudiant::whereDoesntHave('equipe1')
+        ->whereDoesntHave('equipe2')
+        ->whereDoesntHave('equipe3')
+        ->get();
+
+    return response()->json(['etudiants_sans_equipe' => $etudiantsSansEquipe], 200);
+}
+
 public function listEncadrants()
 {
     $encadrants = Encadrant::all();

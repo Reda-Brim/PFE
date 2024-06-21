@@ -41,6 +41,8 @@ Route::middleware('auth:admin-api')->group(function () {
     Route::delete('/delete-etudiant/{id}', [AdminController::class, 'deleteEtudiant']);
     Route::get('/list-etudiants', [AdminController::class, 'listEtudiants']);
     Route::get('/etudiant-infos/{id}', [AdminController::class, 'getEtudiant']);
+    Route::get('/list-etudiants-sans-equipe', [AdminController::class, 'listEtudiantsSansEquipe']);
+
   
 
     Route::post('/add-encadrant', [AdminController::class, 'addEncadrant']);
