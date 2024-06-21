@@ -31,9 +31,9 @@ class AdminController extends Controller
             'email' => 'required|email|unique:etudiants',
             'cin' => 'required|string|max:255|unique:etudiants',
             'cne' => 'required|string|max:255|unique:etudiants',
-            'codeApoge' => 'required|string|max:255|unique:etudiants',
+            'codeApoge' => 'required|max:255|unique:etudiants',
             'filiere' => 'required|string|in:BDD,SID,RES',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:5',
         ]);
     
         // Hachage du mot de passe
@@ -72,9 +72,9 @@ class AdminController extends Controller
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
             'email' => 'required|email|unique:encadrants',
-            'encadrant_code' => 'required|string|max:255|unique:encadrants',
+            'encadrant_code' => 'required|max:255|unique:encadrants',
             'specialite' => 'required|string|max:255',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:5',
         ]);
     
         // Hachage du mot de passe
@@ -112,9 +112,9 @@ class AdminController extends Controller
             'email' => 'sometimes|required|email|unique:etudiants,email,' . $id,
             'cin' => 'sometimes|required|string|max:255|unique:etudiants,cin,' . $id,
             'cne' => 'sometimes|required|string|max:255|unique:etudiants,cne,' . $id,
-            'codeApoge' => 'sometimes|required|string|max:255|unique:etudiants,codeApoge,' . $id,
+            'codeApoge' => 'sometimes|required|max:255|unique:etudiants,codeApoge,' . $id,
             'filiere' => 'sometimes|required|string|in:BDD,SID,RES',
-            'password' => 'nullable|string|min:6|confirmed',
+            'password' => 'nullable|string|min:5',
         ]);
     
         // Recherche de l'étudiant à mettre à jour
@@ -162,9 +162,9 @@ class AdminController extends Controller
             'prenom' => 'sometimes|required|string|max:255',
             'email' => 'sometimes|required|email|unique:encadrants,email,' . $id,
             'cin' => 'sometimes|required|string|max:255|unique:encadrants,cin,' . $id,
-            'encadrant_code' => 'sometimes|required|string|max:255|unique:encadrants,encadrant_code,' . $id,
+            'encadrant_code' => 'sometimes|required|max:255|unique:encadrants,encadrant_code,' . $id,
             'specialite' => 'sometimes|required|string|max:255',
-            'password' => 'nullable|string|min:6|confirmed',
+            'password' => 'nullable|string|min:5',
         ]);
     
         // Recherche de l'encadrant à mettre à jour
