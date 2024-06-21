@@ -80,7 +80,7 @@ Route::middleware('auth:etudiant-api')->group(function () {
 
     Route::post('/etudiant/change-password', [EtudiantController::class, 'changePassword']);
 
-    Route::put('/encadrant/taches/{tacheId}', [EtudiantController::class, 'updateTache']);
+    Route::put('/etudiant/taches/{tacheId}', [EtudiantController::class, 'updateTache']);
 
 
 
