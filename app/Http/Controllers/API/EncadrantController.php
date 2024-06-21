@@ -25,7 +25,10 @@ class EncadrantController extends Controller
     public function listEquipes(Request $request)
     {
         $encadrantCode = $request->user()->encadrant_code;
-        $equipes = Equipe::where('encadrant_code', $encadrantCode)->get();
+        $equipes = Equipe::with(['etudiant1', 'etudiant2', 'etudiant3'])
+            ->where('encadrant_code', $encadrantCode)
+            ->get();
+    
         return response()->json(['equipes' => $equipes]);
     }
 
