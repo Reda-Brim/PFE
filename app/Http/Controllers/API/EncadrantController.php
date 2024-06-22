@@ -123,7 +123,7 @@ public function assignSujetToEquipe(Request $request, $equipeId)
             'date_debut' => $request->date_debut,
             'date_fin' => $request->date_fin,
             'description' => $request->description,
-            'etat' => 'en_cours',
+            'etat' => 'todo',
         ]);
 
         return response()->json(['message' => 'Sujet attribué avec succès à l\'équipe et projet créé.', 'projet' => $projet], 200);
@@ -151,7 +151,7 @@ public function assignSujetToEquipe(Request $request, $equipeId)
             'description' => $request->description,
             'date_debut' => $request->date_debut,
             'date_fin' => $request->date_fin,
-            'etat' => 'en_cours',
+            'etat' => 'todo',
         ]);
 
         if ($request->hasFile('document')) {
