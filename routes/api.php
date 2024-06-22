@@ -62,6 +62,8 @@ Route::middleware('auth:admin-api')->group(function () {
     Route::post('/add-sujets', [AdminController::class, 'addSujet']);
     Route::put('/update-sujet/{id}', [AdminController::class, 'updateSujet']);
     Route::delete('/delete-sujet/{id}', [AdminController::class, 'deleteSujet']);
+    Route::get('/sujet-infos/{id}', [AdminController::class, 'getSujetInfos']);
+
 
     Route::post('/createequipe', [AdminController::class, 'createEquipe']);
     Route::put('/assignencadrant/{id}', [AdminController::class, 'assignEncadrant']);

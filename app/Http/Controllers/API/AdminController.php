@@ -356,6 +356,20 @@ public function addSujet(Request $request)
         return response()->json(['error' => 'Erreur lors de l\'ajout du sujet: ' . $e->getMessage()], 500);
     }
 }
+
+public function getSujetInfos($id)
+{
+    try {
+        // Recherche du sujet par son ID
+        $sujet = Sujets::findOrFail($id);
+
+        // Retour des informations du sujet
+        return response()->json(['sujet' => $sujet], 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Sujet non trouvé'], 404);
+    }
+}
+
 public function updateSujet(Request $request, $id)
 {
     try {
