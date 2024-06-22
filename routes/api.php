@@ -66,6 +66,8 @@ Route::middleware('auth:admin-api')->group(function () {
     Route::post('/createequipe', [AdminController::class, 'createEquipe']);
     Route::put('/assignencadrant/{id}', [AdminController::class, 'assignEncadrant']);
     Route::put('/update-equipe/{id}', [AdminController::class, 'updateEquipe']);
+    Route::get('/equipe-Infos/{id}', [AdminController::class, 'equipeInfos']);
+
 
     Route::get('/list-equipes', [AdminController::class, 'listEquipes']);
     Route::post('/list-equipes/{equipe}/addmembre', [AdminController::class, 'addMemberToEquipe']);

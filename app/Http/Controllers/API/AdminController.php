@@ -492,6 +492,13 @@ public function addMemberToEquipe(Request $request, Equipe $equipe)
         return response()->json(['message' => 'Étudiant ajouté à l\'équipe avec succès.'], 200);
     }
 
+    public function equipeInfos($id)
+    {
+        $equipe = Equipe::with(['etudiant1', 'etudiant2', 'etudiant3', 'encadrant'])->findOrFail($id);
+    
+        return response()->json(['equipe' => $equipe], 200);
+    }
+    
 
     public function removeMemberFromEquipe(Request $request, Equipe $equipe)
     {
