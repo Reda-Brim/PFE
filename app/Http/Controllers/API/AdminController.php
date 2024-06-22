@@ -299,6 +299,13 @@ public function updateAdmin(Request $request)
     return response()->json(['message' => 'Informations administrateur mises à jour avec succès', 'admin' => $admin]);
 }
 
+public function listSujets()
+{
+    $sujets = Sujets::all();
+    return response()->json(['sujets' => $sujets], 200);
+}
+
+
 public function addSujet(Request $request)
 {
     try {
