@@ -104,6 +104,8 @@ Route::middleware('auth:encadrant-api')->group(function () {
     Route::post('/encadrant/add-sujets', [EncadrantController::class, 'addSujet']);
     Route::post('/encadrant/equipes/{equipe}/assign-sujet', [EncadrantController::class, 'assignSujetToEquipe']);
 
+    Route::get('/encadrant/projets/{projetId}/taches', [EncadrantController::class, 'getTachesByProjet']);
+
     Route::post('/encadrant/projets/{projetId}/taches', [EncadrantController::class, 'addTacheToProjet']);
     Route::put('/encadrant/taches/{tacheId}', [EncadrantController::class, 'updateTache']);
     Route::delete('/encadrant/taches/{tacheId}', [EncadrantController::class, 'deleteTache']);
