@@ -111,10 +111,11 @@ public function changePassword(Request $request)
     public function updateTache(Request $request, $tacheId)
     {
         $tache = Tache::findOrFail($tacheId);
+        error_log($request->document);
 
         // Validation des données d'entrée avec les règles conditionnelles
         $request->validate([
-            'etat' => 'required|in:todo,encours,toreview,termine',
+            'etat' => 'sometimes|in:todo,encours,toreview,termine',
             'document' => 'nullable|file|mimes:pdf|max:2048', // Optional document
         ]);
 
@@ -129,16 +130,20 @@ public function changePassword(Request $request)
         }
 
         // Mise à jour de l'état de la tâche
-        $tache->etat = $request->etat;
-        $tache->save();
-
+        if($request->hasFile('document')){
+            $tache->etat = 'toreview';
+            $tache->save();
+        }else{
+            $tache->etat = $request->etat;
+            $tache->save();
+        }
         // Gérer le document s'il est fourni
         if ($request->hasFile('document')) {
             // Supprimer l'ancien document s'il existe
             $existingDocument = Document::where('tache_id', $tache->id)->first();
             if ($existingDocument) {
                 $firebase = (new Factory)
-                    ->withServiceAccount(storage_path('app/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))
+                    ->withServiceAccount(storage_path('app/documents/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))
                     ->createStorage();
                 $bucket = $firebase->getBucket();
                 $bucket->object('documents/' . basename($existingDocument->lien))->delete();
@@ -148,7 +153,7 @@ public function changePassword(Request $request)
             // Enregistrer le nouveau document
             $documentPath = $request->file('document')->store('documents');
             $firebase = (new Factory)
-                ->withServiceAccount(storage_path('app/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))
+                ->withServiceAccount(storage_path('app/documents/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))
                 ->createStorage();
             $bucket = $firebase->getBucket();
 

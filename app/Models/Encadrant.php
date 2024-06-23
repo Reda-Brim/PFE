@@ -12,7 +12,7 @@ class Encadrant extends Authenticatable
     use HasApiTokens, Notifiable;
 
     protected $fillable = [
-        'nom', 'prenom', 'email', 'specialite', 'password','encadrant_code',
+        'nom', 'prenom', 'email', 'specialite', 'password','encadrant_code','supabase_id',
     ];
 
     protected $hidden = [

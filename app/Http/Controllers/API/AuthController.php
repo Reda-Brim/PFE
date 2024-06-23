@@ -71,14 +71,16 @@ class AuthController extends Controller
         // Génération du jeton d'accès
         $token = $user->createToken("{$type}Token")->accessToken;
         $id = $user->id;
-        $username = $user->email;
+        $username = $user->nom.' '.$user->prenom;
+        $supabase = $user->supabase_id;
 
         // Retourner les informations de l'utilisateur et le jeton d'accès
         return response()->json([
             'id' => $id,
             'username' => $username,
             'token' => $token,
-            'type' => $type
+            'type' => $type,
+            'supabase' => $supabase
         ], 200);
     }
 

@@ -142,6 +142,9 @@ class AdminController extends Controller
         if ($request->has('filiere')) {
             $etudiant->filiere = $request->filiere;
         }
+        if ($request->has('supabase_id')) {
+            $etudiant->supabase_id = $request->supabase_id;
+        }
     
         // Mise à jour du mot de passe s'il est fourni
         if ($request->has('password')) {
@@ -188,6 +191,9 @@ class AdminController extends Controller
         }
         if ($request->has('specialite')) {
             $encadrant->specialite = $request->specialite;
+        }
+        if ($request->has('supabase_id')) {
+            $encadrant->supabase_id = $request->supabase_id;
         }
     
         // Mise à jour du mot de passe s'il est fourni
@@ -308,6 +314,7 @@ public function listSujets()
 
 public function addSujet(Request $request)
 {
+    error_log($request->nom);
     try {
         // Validation des données d'entrée
         $request->validate([
@@ -331,7 +338,7 @@ public function addSujet(Request $request)
         }
 
         // Configuration de Firebase
-        $firebase = (new Factory)->withServiceAccount(storage_path('app/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))->createStorage();
+        $firebase = (new Factory)->withServiceAccount(storage_path('app\documents\pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))->createStorage();
         $bucket = $firebase->getBucket();
 
         // Téléverser le fichier PDF vers Firebase Storage
@@ -384,7 +391,7 @@ public function updateSujet(Request $request, $id)
             }
 
             // Configuration de Firebase
-            $firebase = (new Factory)->withServiceAccount(storage_path('app/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))->createStorage();
+            $firebase = (new Factory)->withServiceAccount(storage_path('app/documents/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))->createStorage();
             $bucket = $firebase->getBucket();
 
             // Téléverser le fichier PDF vers Firebase Storage
@@ -415,7 +422,7 @@ public function deleteSujet($id)
         $sujet = Sujets::findOrFail($id);
 
         // Supprimer le fichier du stockage Firebase
-        $firebase = (new Factory)->withServiceAccount(storage_path('app/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))->createStorage();
+        $firebase = (new Factory)->withServiceAccount(storage_path('app/documents/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))->createStorage();
         $bucket = $firebase->getBucket();
         $firebaseStoragePath = 'documents/' . basename($sujet->document);
         $object = $bucket->object($firebaseStoragePath);

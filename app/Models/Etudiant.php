@@ -13,7 +13,7 @@ class Etudiant extends Authenticatable
     use HasApiTokens, Notifiable, HasFactory;
 
     protected $fillable = [
-        'nom', 'prenom', 'email', 'codeApoge', 'cin', 'cne', 'filiere', 'password',
+        'nom', 'prenom', 'email', 'codeApoge', 'cin', 'cne', 'filiere', 'password','supabase_id',
     ];
 
     protected $hidden = [

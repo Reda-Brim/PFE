@@ -28,6 +28,11 @@ class EncadrantController extends Controller
         $equipes = Equipe::with(['etudiant1', 'etudiant2', 'etudiant3'])
             ->where('encadrant_code', $encadrantCode)
             ->get();
+        
+        foreach ($equipes as $equipe) {
+            $projet = Projet::where('equipe_id', $equipe->id)->with('sujet')->first();
+            $equipe->sujet = $projet ? $projet->sujet->nom : null;
+        }
     
         return response()->json(['equipes' => $equipes]);
     }
@@ -214,7 +219,7 @@ public function assignSujetToEquipe(Request $request, $equipeId)
             // Enregistrer le nouveau document
             $documentPath = $request->file('document')->store('documents');
             $firebase = (new Factory)
-                ->withServiceAccount(storage_path('app/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))
+                ->withServiceAccount(storage_path('app/documents/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))
                 ->createStorage();
             $bucket = $firebase->getBucket();
 
@@ -251,7 +256,7 @@ public function assignSujetToEquipe(Request $request, $equipeId)
         foreach ($documents as $document) {
             // Supprimer le fichier de Firebase Storage
             $firebase = (new Factory)
-                ->withServiceAccount(storage_path('app/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))
+                ->withServiceAccount(storage_path('app/documents/pfe-files-firebase-adminsdk-rp3sy-cfd99cff86.json'))
                 ->createStorage();
             $bucket = $firebase->getBucket();
             $bucket->object('documents/' . basename($document->lien))->delete();
