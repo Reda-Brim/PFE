@@ -305,6 +305,13 @@ public function listSujets()
     return response()->json(['sujets' => $sujets], 200);
 }
 
+public function listSujetsDisponible()
+{
+    $sujets = Sujets::where('disponible', true)->get();
+    return response()->json(['sujets' => $sujets]);
+}
+
+
 
 public function addSujet(Request $request)
 {

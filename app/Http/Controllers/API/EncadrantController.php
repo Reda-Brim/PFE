@@ -37,6 +37,11 @@ class EncadrantController extends Controller
         $sujets = Sujets::all();
         return response()->json(['sujets' => $sujets]);
     }
+    public function listSujetsDisponible()
+{
+    $sujets = Sujets::where('disponible', true)->get();
+    return response()->json(['sujets' => $sujets]);
+}
 
     public function addSujet(Request $request)
 {
