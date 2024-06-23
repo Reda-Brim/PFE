@@ -133,6 +133,25 @@ public function assignSujetToEquipe(Request $request, $equipeId)
 
         return response()->json(['message' => 'Sujet attribué avec succès à l\'équipe et projet créé.', 'projet' => $projet], 200);
     }
+    public function getTachesByProjet($projetId)
+    {
+        // Récupérer l'encadrant actuellement authentifié
+        $encadrantCode = Auth::user()->encadrant_code;
+
+        // Trouver le projet par ID et vérifier que l'encadrant en est responsable
+        $projet = Projet::findOrFail($projetId);
+
+        // Vérifier que l'encadrant est responsable de ce projet
+        if ($projet->equipe->encadrant_code !== $encadrantCode) {
+            return response()->json(['error' => 'Vous n\'êtes pas autorisé à voir les tâches de ce projet.'], 403);
+        }
+
+        // Récupérer toutes les tâches associées à ce projet
+        $taches = $projet->taches;
+
+        // Retourner les tâches dans une réponse JSON
+        return response()->json(['taches' => $taches], 200);
+    }
 
     public function addTacheToProjet(Request $request, $projetId)
     {

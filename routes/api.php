@@ -62,6 +62,8 @@ Route::middleware('auth:admin-api')->group(function () {
     Route::post('/add-sujets', [AdminController::class, 'addSujet']);
     Route::put('/update-sujet/{id}', [AdminController::class, 'updateSujet']);
     Route::delete('/delete-sujet/{id}', [AdminController::class, 'deleteSujet']);
+    Route::get('/sujet-infos/{id}', [AdminController::class, 'getSujetInfos']);
+
 
     Route::post('/createequipe', [AdminController::class, 'createEquipe']);
     Route::put('/assignencadrant/{id}', [AdminController::class, 'assignEncadrant']);
@@ -101,6 +103,8 @@ Route::middleware('auth:encadrant-api')->group(function () {
     Route::get('/encadrant/sujets', [EncadrantController::class, 'listSujets']);
     Route::post('/encadrant/add-sujets', [EncadrantController::class, 'addSujet']);
     Route::post('/encadrant/equipes/{equipe}/assign-sujet', [EncadrantController::class, 'assignSujetToEquipe']);
+
+    Route::get('/encadrant/projets/{projetId}/taches', [EncadrantController::class, 'getTachesByProjet']);
 
     Route::post('/encadrant/projets/{projetId}/taches', [EncadrantController::class, 'addTacheToProjet']);
     Route::put('/encadrant/taches/{tacheId}', [EncadrantController::class, 'updateTache']);
