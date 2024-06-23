@@ -128,18 +128,20 @@ public function assignSujetToEquipe(Request $request, $equipeId)
             'date_debut' => $request->date_debut,
             'date_fin' => $request->date_fin,
             'description' => $request->description,
-            'etat' => 'todo',
+            'etat' => 'en_cours',
         ]);
 
         return response()->json(['message' => 'Sujet attribué avec succès à l\'équipe et projet créé.', 'projet' => $projet], 200);
     }
-    public function getTachesByProjet($projetId)
+    public function getTachesByProjet($equipeId)
     {
         // Récupérer l'encadrant actuellement authentifié
         $encadrantCode = Auth::user()->encadrant_code;
 
-        // Trouver le projet par ID et vérifier que l'encadrant en est responsable
-        $projet = Projet::findOrFail($projetId);
+       
+        //$projet = Projet::findOrFail('equipe_id', $equipeId);
+
+        $projet = Projet::where('equipe_id', $equipeId)->first();
 
         // Vérifier que l'encadrant est responsable de ce projet
         if ($projet->equipe->encadrant_code !== $encadrantCode) {
