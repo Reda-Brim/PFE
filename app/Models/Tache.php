@@ -17,6 +17,7 @@ class Tache extends Model
         'date_fin',
         'etat',
         'feedback',
+        'document'
     ];
 
     public function projet()

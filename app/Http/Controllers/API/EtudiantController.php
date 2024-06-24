@@ -115,7 +115,7 @@ public function changePassword(Request $request)
 
         // Validation des données d'entrée avec les règles conditionnelles
         $request->validate([
-            'etat' => 'sometimes|in:todo,encours,toreview,termine',
+            'etat' => 'nullable|in:todo,encours,toreview,termine',
             'document' => 'nullable|file|mimes:pdf|max:2048', // Optional document
         ]);
 
@@ -128,14 +128,12 @@ public function changePassword(Request $request)
             $equipe->etudiant_3_codeApoge !== $etudiant->codeApoge) {
             return response()->json(['error' => 'Vous n\'êtes pas autorisé à modifier cette tâche.'], 403);
         }
-
-        // Mise à jour de l'état de la tâche
-        if($request->hasFile('document')){
-            $tache->etat = 'toreview';
-            $tache->save();
-        }else{
+        
+        if ($request->has('etat')) {
             $tache->etat = $request->etat;
             $tache->save();
+        } else {
+            return response()->json(['error' => 'Le champ etat est requis.'], 400);
         }
         // Gérer le document s'il est fourni
         if ($request->hasFile('document')) {

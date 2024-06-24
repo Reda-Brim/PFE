@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Admin;
 use App\Models\Etudiant;
 use App\Models\Encadrant;
+use App\Models\Equipe;
+use App\Models\Projet;
 
 class AuthController extends Controller
 {
@@ -23,6 +25,8 @@ class AuthController extends Controller
         // Recherche de l'utilisateur par email
         $user = null;
         $type = null;
+        $sujet = null;
+        $equipe = null;
         $email = $request->email;
         $password = $request->password;
 
@@ -44,6 +48,13 @@ class AuthController extends Controller
                 if (Hash::check($password, $etudiant->password)) {
                     $user = $etudiant;
                     $type = 'etudiant';
+                    $equipe = Equipe::where('etudiant_1_codeApoge', $etudiant->codeApoge)
+                        ->orWhere('etudiant_2_codeApoge', $etudiant->codeApoge)
+                        ->orWhere('etudiant_3_codeApoge', $etudiant->codeApoge)
+                        ->first();
+                    $projet = Projet::where('equipe_id', $equipe->id)->with('sujet')->first();
+                    $sujet = $projet->sujet->nom;
+                    $equipe = $equipe->id;
                 } else {
                     return response()->json(['error' => 'Incorrect password'], 401);
                 }
@@ -73,6 +84,7 @@ class AuthController extends Controller
         $id = $user->id;
         $username = $user->nom.' '.$user->prenom;
         $supabase = $user->supabase_id;
+        $email = $user->email;
 
         // Retourner les informations de l'utilisateur et le jeton d'accès
         return response()->json([
@@ -80,7 +92,10 @@ class AuthController extends Controller
             'username' => $username,
             'token' => $token,
             'type' => $type,
-            'supabase' => $supabase
+            'email' => $email,
+            'supabase' => $supabase,
+            'sujet' => $sujet,
+            'equipe' => $equipe
         ], 200);
     }
 

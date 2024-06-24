@@ -52,12 +52,12 @@ Route::middleware('auth:admin-api')->group(function () {
     Route::get('/encadrant-infos/{id}', [AdminController::class, 'getEncadrant']);
 
 
-    Route::get('/admin-infos', [AdminController::class, 'getAdmin']);
-    Route::put('/update-admin', [AdminController::class, 'updateAdmin']);
+    Route::get('/admin-infos/{email}', [AdminController::class, 'getAdmin']);
+    Route::post('/update-admin', [AdminController::class, 'updateAdmin']);
 
     Route::get('/admin/statistics', [AdminController::class, 'getStatistics']);
 
-    Route::get('/encadrant/sujets', [AdminController::class, 'listSujetsDisponible']);
+    Route::get('/sujets', [AdminController::class, 'listSujetsDisponible']);
     Route::get('/list-sujets', [AdminController::class, 'listSujets']);
     Route::post('/add-sujets', [AdminController::class, 'addSujet']);
     Route::put('/update-sujet/{id}', [AdminController::class, 'updateSujet']);
@@ -88,6 +88,7 @@ Route::middleware('auth:etudiant-api')->group(function () {
 
     Route::post('/etudiant/change-password', [EtudiantController::class, 'changePassword']);
 
+    Route::post('/etudiant/taches/{tacheId}', [EtudiantController::class, 'updateTache']);
     Route::put('/etudiant/taches/{tacheId}', [EtudiantController::class, 'updateTache']);
 
 
@@ -98,11 +99,13 @@ Route::middleware('auth:encadrant-api')->group(function () {
         return response()->json(['message' => 'Encadrant Dashboard', 'user' => $request->user()]);
     });
     
-    Route::get('/encadrant/sujets', [EncadrantController::class, 'listSujetsDisponible']);
+    Route::get('/sujets', [EncadrantController::class, 'listSujetsDisponible']);
     Route::get('/encadrant/equipes', [EncadrantController::class, 'listEquipes']);
     Route::get('/encadrant/sujets', [EncadrantController::class, 'listSujets']);
     Route::post('/encadrant/add-sujets', [EncadrantController::class, 'addSujet']);
     Route::post('/encadrant/equipes/{equipe}/assign-sujet', [EncadrantController::class, 'assignSujetToEquipe']);
+
+    Route::get('/encadrant/projets/{projetId}/taches', [EncadrantController::class, 'getTachesByProjet']);
 
     Route::post('/encadrant/projets/{projetId}/taches', [EncadrantController::class, 'addTacheToProjet']);
     Route::put('/encadrant/taches/{tacheId}', [EncadrantController::class, 'updateTache']);

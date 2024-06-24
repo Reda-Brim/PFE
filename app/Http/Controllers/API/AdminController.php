@@ -265,16 +265,40 @@ public function getEncadrant($id)
     return response()->json(['encadrant' => $encadrant]);
 }
 
-public function getAdmin(Request $request)
+public function getAdmin(Request $request, $email)
 {
-    $admin = $request->user();
-    return response()->json(['admin' => $admin]);
+    $admin = Admin::where('email', $email)->first();
+    if ($admin) {
+        return response()->json(['admin' => $admin]);
+    }
+
+        // Si aucun admin n'est trouvé, vérifiez les étudiants
+        
+    $etudiant = Etudiant::where('email', $email)->first();
+    if ($etudiant) {
+        return response()->json(['admin' => $etudiant]);
+    }
+
+
+// Si aucun étudiant n'est trouvé, vérifiez les encadrants
+
+    $encadrant = Encadrant::where('email', $email)->first();
+    if ($encadrant) {
+        return response()->json(['admin' => $encadrant]);
+    }
+
 }
 
 public function updateAdmin(Request $request)
 {
     // Récupérer l'administrateur authentifié
-    $admin = $request->user();
+    $type = $request->type;
+    if($type == 'admin'){
+        $admin = Admin::where('email' ,$request->email)->first();}
+    elseif($type == 'etudiant'){
+        $admin = Etudiant::where('email' ,$request->email)->first();}
+    elseif($type == 'encadrant'){
+        $admin = Encadrant::where('email' ,$request->email)->first();}
 
     // Valider les données d'entrée
     $request->validate([
@@ -491,6 +515,12 @@ public function assignEncadrant(Request $request, $id)
 public function listEquipes()
 {
     $equipes = Equipe::with(['etudiant1', 'etudiant2', 'etudiant3', 'encadrant'])->get();
+
+     foreach ($equipes as $equipe) {
+            $projet = Projet::where('equipe_id', $equipe->id)->with('sujet')->first();
+            $equipe->sujet = $projet ? $projet->sujet->nom : null;
+        }
+
     return response()->json(['equipes' => $equipes], 200);
 }
 public function addMemberToEquipe(Request $request, Equipe $equipe)
